@@ -5,6 +5,7 @@ go 1.15
 require (
 	github.com/go-kit/kit v0.10.0
 	github.com/go-playground/validator/v10 v10.4.1
+	github.com/pkg/errors v0.8.1
 	github.com/satori/go.uuid v1.2.0
 	github.com/sethvargo/go-envconfig v0.3.2
 	github.com/stretchr/testify v1.7.0
