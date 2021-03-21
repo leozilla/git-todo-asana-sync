@@ -9,7 +9,10 @@ import (
 )
 
 type Config struct {
-	GitRepoUrl string `env:"GIT_REPO_URL" validate:"hostname|hostname_rfc1123|ip"`
+	GitDir string `env:"GIT_DIR" validate:"endswith=.git,file"`
+
+	AsanaServerUrl   string `env:"ASANA_SERVER_URL" validate:"url|uri"`
+	AsanaAccessToken string `env:"ASANA_ACCESS_TOKEN" validate:"required"`
 }
 
 func MustLoadFromEnv(ctx context.Context, logger *zap.Logger) Config {
