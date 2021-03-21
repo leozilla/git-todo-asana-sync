@@ -1,29 +1,18 @@
 package cmd
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/pkg/errors"
-	"io/ioutil"
 	"os/exec"
 )
 
-func RunCommandWithOutput(cmd *exec.Cmd) ([]byte, error) {
-	stdout, err := cmd.StdoutPipe()
-	if err != nil {
-		return nil, err
-	}
+func RunCommand(cmd *exec.Cmd) ([]byte, error) {
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
 
-	stderr, err := cmd.StderrPipe()
-	if err != nil {
-		return nil, err
-	}
-
-	err = cmd.Start()
-	if err != nil {
-		return nil, err
-	}
-
-	errData, err := ioutil.ReadAll(stderr)
+	err := cmd.Start()
 	if err != nil {
 		return nil, err
 	}
@@ -33,14 +22,9 @@ func RunCommandWithOutput(cmd *exec.Cmd) ([]byte, error) {
 		return nil, err
 	}
 
-	outData, err := ioutil.ReadAll(stdout)
-	if err != nil {
-		return nil, err
+	if len(stderr.Bytes()) > 0 {
+		return nil, errors.New(fmt.Sprintf("Executing command %s was not successful. Failed with %s", cmd.String(), string(stderr.Bytes())))
 	}
 
-	if len(errData) > 0 {
-		return nil, errors.New(fmt.Sprintf("Executing command %s was not successful. Failed with %s", cmd.String(), string(errData)))
-	}
-
-	return outData, nil
+	return stdout.Bytes(), nil
 }

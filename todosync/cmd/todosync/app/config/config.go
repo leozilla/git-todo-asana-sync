@@ -9,7 +9,7 @@ import (
 )
 
 type Config struct {
-	GitDir string `env:"GIT_DIR" validate:"endswith=.git,file"`
+	GitDir string `env:"GIT_PATH" validate:"dir"`
 
 	AsanaServerUrl   string `env:"ASANA_SERVER_URL" validate:"url|uri"`
 	AsanaAccessToken string `env:"ASANA_ACCESS_TOKEN" validate:"required"`

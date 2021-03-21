@@ -4,34 +4,37 @@ import (
 	"git-todo-asana-sync/todosync/pkg/cmd"
 	"go.uber.org/zap"
 	"os/exec"
+	"strings"
 )
 
 type GitCmdExec struct {
-	gitDir string
-	logger *zap.Logger
+	gitPath string
+	logger  *zap.Logger
 }
 
 const (
-	GitDirArg  = "--git-dir"
+	GitPathArg = "-C"
 	GitGrepCmd = "grep"
 )
 
-func NewGitCmdExec(logger *zap.Logger, gitDir string) *GitCmdExec {
+func NewGitCmdExec(logger *zap.Logger, gitPath string) *GitCmdExec {
 	return &GitCmdExec{
-		gitDir: gitDir,
-		logger: logger,
+		gitPath: gitPath,
+		logger:  logger,
 	}
 }
 
-func (git *GitCmdExec) Exec() (string, error) {
-	pattern := "'TODO'"
+func (git *GitCmdExec) Exec() ([]string, error) {
+	pattern := "TODO"
 
 	git.logger.Info("Running git grep",
-		zap.String(GitDirArg, git.gitDir),
+		zap.String(GitPathArg, git.gitPath),
 		zap.String("grep-pattern", pattern))
 
-	c := exec.Command("git", GitDirArg, git.gitDir, GitGrepCmd, pattern)
+	c := exec.Command("git", GitPathArg, git.gitPath, GitGrepCmd, pattern)
 
-	out, err := cmd.RunCommandWithOutput(c)
-	return string(out), err
+	out, err := cmd.RunCommand(c)
+
+	outLines := strings.Split(string(out), "\n")
+	return outLines, err
 }
